@@ -16,3 +16,7 @@
 ## v1.0
 
 Launch bot and pushing source code to GitHub.
+
+## v1.1
+
+Fix: verification duplicate buttons ids.

@@ -1,5 +1,4 @@
 const { Events, ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection } = require('discord.js');
-// const servers = require('../../serversData.json');
 const { servers } = require('../db');
 
 const correctAnswers = new Collection();
@@ -33,7 +32,7 @@ module.exports = {
                             rndButtons.push(
                                 new ButtonBuilder()
                                     .setLabel(`${a + b}`)
-                                    .setCustomId(`verifBtn${a + b}`)
+                                    .setCustomId(`verifBtnRight`)
                                     .setStyle(ButtonStyle.Primary)
                             );
                         } else {
@@ -42,8 +41,14 @@ module.exports = {
 
                             rndButtons.push(
                                 new ButtonBuilder()
-                                    .setLabel(`${rndAnswer === a + b ? rndAnswer - 5 : rndAnswer}`)
-                                    .setCustomId(`verifBtn${rndAnswer === a + b ? rndAnswer - 5 : rndAnswer}`)
+                                    .setLabel(
+                                        `${
+                                            rndAnswer === a + b
+                                                ? Math.floor(Math.random() * (35 - 8 + 1) + 8)
+                                                : rndAnswer
+                                        }`
+                                    )
+                                    .setCustomId(`verifBtn${i}`)
                                     .setStyle(ButtonStyle.Primary)
                             );
                         }
@@ -63,11 +68,11 @@ module.exports = {
                     });
                 }
             } else if (interaction.customId.startsWith('verifBtn')) {
-                const receivedAnswer = parseInt(interaction.customId.substring(8));
-                const userCorrectAnswer = correctAnswers.get(interaction.user.id);
+                const receivedAnswer = interaction.customId.substring(8);
+                const userAnswered = correctAnswers.get(interaction.user.id);
                 //check if correct answer exists
-                if (userCorrectAnswer) {
-                    if (receivedAnswer === userCorrectAnswer) {
+                if (userAnswered) {
+                    if (receivedAnswer === 'Right') {
                         interaction.member.roles.add(interaction.guild.roles.cache.get(currGuild.verifiedRoleID));
 
                         interaction.reply({
