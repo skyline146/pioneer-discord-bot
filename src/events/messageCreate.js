@@ -140,14 +140,13 @@ module.exports = {
                     }
                 }
             } catch (err) {
-                console.log(err.response);
-
                 await newMessage.delete();
 
-                await message.reply({
-                    content: `Возникла ошибка при обработке запроса, либо вы ввели данные, которые являются оскорбительного/сексуального/политического характера.`,
-                    ephemeral: true,
-                });
+                if (err.response?.data?.error) {
+                    await message.reply(err.response.data.error.message);
+                } else {
+                    await message.reply(`Возникла ошибка при обработке запроса.`);
+                }
             }
         }
     },
