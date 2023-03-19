@@ -6,6 +6,7 @@ const {
     EmbedBuilder,
     Colors,
 } = require('discord.js');
+const accessDenied = require('../../utils/accessDenied');
 const blacklist = require('../../../blacklist.json');
 
 const reportChannels = {
@@ -32,7 +33,7 @@ module.exports = {
     async execute(interaction) {
         //find if user in blacklist
         if (blacklist.find(id => interaction.user.id === id)) {
-            await interaction.reply({ content: '⛔ У вас нет прав использовать эту команду.', ephemeral: true });
+            accessDenied(interaction);
             return;
         }
 
@@ -88,7 +89,6 @@ module.exports = {
             await reportChannel.send({ embeds: [reportEmded] });
             await interaction.editReply({
                 content: `Отчёт успешно отправлен! Спасибо за то что помогаете сделать бота ещё лучше!`,
-                ephemeral: true,
                 components: [],
             });
         });
