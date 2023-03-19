@@ -30,7 +30,7 @@ module.exports = {
 
                         // text += `Human: ${message.content}\n`;
 
-                        const { davinci } = await gptSettings.get(message.guildId);
+                        // const { davinci } = await gptSettings.get(message.guildId);
 
                         const chatLog = (await chat.get(message.guildId)) ?? [];
 
