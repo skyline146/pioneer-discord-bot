@@ -21,11 +21,11 @@ module.exports = {
     async execute(interaction) {
         if (interaction.user.id === '340447087642673153') {
             try {
-                const model = interaction.options.getString('model');
-                const temperature = interaction.options.getNumber('temperature') ?? 1;
-                const max_tokens = interaction.options.getNumber('max-tokens') ?? 16;
-                const frequency_penalty = interaction.options.getNumber('frequency-penalty') ?? 0;
-                const presence_penalty = interaction.options.getNumber('presence-penalty') ?? 0;
+                const model = interaction.options.getString('model'),
+                    temperature = interaction.options.getNumber('temperature') ?? 1,
+                    max_tokens = interaction.options.getNumber('max-tokens') ?? 16,
+                    frequency_penalty = interaction.options.getNumber('frequency-penalty') ?? 0,
+                    presence_penalty = interaction.options.getNumber('presence-penalty') ?? 0;
 
                 let settings = await gptSettings.get(interaction.guild.id);
 
