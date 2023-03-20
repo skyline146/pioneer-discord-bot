@@ -13,7 +13,10 @@ module.exports = {
                 await interaction.deferReply({ ephemeral: true });
 
                 const data = await servers.get(interaction.guild.id);
-                if (Object.keys(data).length === 0) throw new Error();
+                if (Object.keys(data).length === 0) {
+                    await interaction.editReply('Данных вашего сервера нет в базе.');
+                    return;
+                }
 
                 await interaction.editReply({ content: 'Файл генерируется, пожалуйста подождите...' });
 
@@ -22,7 +25,7 @@ module.exports = {
                 );
             } catch (err) {
                 console.log(err);
-                await interaction.editReply('Возникла ошибка при получении данных либо данных вашего сервера нет.');
+                await interaction.editReply('Возникла ошибка при получении данных.');
             }
         } else {
             accessDenied(interaction);
