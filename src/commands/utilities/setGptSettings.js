@@ -19,59 +19,60 @@ module.exports = {
         .addNumberOption(option => option.setName('frequency-penalty').setDescription('Exclude repeated sentences.'))
         .addNumberOption(option => option.setName('presence-penalty').setDescription('Include new topics.')),
     async execute(interaction) {
-        if (interaction.user.id === '340447087642673153') {
-            try {
-                const model = interaction.options.getString('model'),
-                    temperature = interaction.options.getNumber('temperature') ?? 1,
-                    max_tokens = interaction.options.getNumber('max-tokens') ?? 16,
-                    frequency_penalty = interaction.options.getNumber('frequency-penalty') ?? 0,
-                    presence_penalty = interaction.options.getNumber('presence-penalty') ?? 0;
-
-                let settings = await gptSettings.get(interaction.guild.id);
-
-                if (!settings) {
-                    settings = {
-                        davinci: {},
-                        curie: {},
-                    };
-                }
-
-                switch (model) {
-                    case 'davinci': {
-                        settings.davinci = {
-                            temperature,
-                            max_tokens,
-                            frequency_penalty,
-                            presence_penalty,
-                        };
-
-                        break;
-                    }
-
-                    case 'curie': {
-                        settings.curie = {
-                            temperature,
-                            max_tokens,
-                            frequency_penalty,
-                            presence_penalty,
-                        };
-
-                        break;
-                    }
-                }
-
-                await gptSettings.set(interaction.guild.id, settings);
-
-                await interaction.reply({
-                    content: `Настройки были успешно изменены.\n${JSON.stringify(settings)}`,
-                    ephemeral: true,
-                });
-            } catch (err) {
-                console.log(err);
-                await interaction.reply({ content: 'Возникла ошибка при изменении настроек.', ephemeral: true });
-            }
-        } else {
+        if (interaction.user.id !== '340447087642673153') {
             accessDenied(interaction);
+            return;
+        }
+
+        try {
+            const model = interaction.options.getString('model'),
+                temperature = interaction.options.getNumber('temperature') ?? 1,
+                max_tokens = interaction.options.getNumber('max-tokens') ?? 16,
+                frequency_penalty = interaction.options.getNumber('frequency-penalty') ?? 0,
+                presence_penalty = interaction.options.getNumber('presence-penalty') ?? 0;
+
+            let settings = await gptSettings.get(interaction.guild.id);
+
+            if (!settings) {
+                settings = {
+                    davinci: {},
+                    curie: {},
+                };
+            }
+
+            switch (model) {
+                case 'davinci': {
+                    settings.davinci = {
+                        temperature,
+                        max_tokens,
+                        frequency_penalty,
+                        presence_penalty,
+                    };
+
+                    break;
+                }
+
+                case 'curie': {
+                    settings.curie = {
+                        temperature,
+                        max_tokens,
+                        frequency_penalty,
+                        presence_penalty,
+                    };
+
+                    break;
+                }
+            }
+
+            await gptSettings.set(interaction.guild.id, settings);
+
+            await interaction.reply({
+                content: `Настройки были успешно изменены.\n${JSON.stringify(settings)}`,
+                ephemeral: true,
+            });
+        } catch (err) {
+            console.log(err);
+            await interaction.reply({ content: 'Возникла ошибка при изменении настроек.', ephemeral: true });
         }
     },
 };

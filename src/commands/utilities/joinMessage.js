@@ -26,30 +26,31 @@ module.exports = {
         const text = interaction.options.getString('text');
         const channel = interaction.options.getChannel('channel');
 
-        if (interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
-            try {
-                const guild = await servers.get(interaction.guild.id);
-
-                servers.set(interaction.guild.id, {
-                    ...guild,
-                    greetings: {
-                        text,
-                        channel: channel.id,
-                    },
-                });
-
-                await interaction.reply({
-                    content: 'Приветствие на сервере успешно создано.',
-                    ephemeral: true,
-                });
-            } catch {
-                await interaction.reply({
-                    content: 'Возникла ошибка при отправке данных.',
-                    ephemeral: true,
-                });
-            }
-        } else {
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
             accessDenied(interaction);
+            return;
+        }
+
+        try {
+            const guild = await servers.get(interaction.guild.id);
+
+            servers.set(interaction.guild.id, {
+                ...guild,
+                greetings: {
+                    text,
+                    channel: channel.id,
+                },
+            });
+
+            await interaction.reply({
+                content: 'Приветствие на сервере успешно создано.',
+                ephemeral: true,
+            });
+        } catch {
+            await interaction.reply({
+                content: 'Возникла ошибка при отправке данных.',
+                ephemeral: true,
+            });
         }
     },
 };
