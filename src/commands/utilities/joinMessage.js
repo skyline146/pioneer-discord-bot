@@ -39,6 +39,7 @@ module.exports = {
                 greetings: {
                     text,
                     channel: channel.id,
+                    channelName: channel.name,
                 },
             });
 
