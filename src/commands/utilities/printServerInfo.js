@@ -18,7 +18,7 @@ module.exports = {
                 await interaction.editReply({ content: 'Файл генерируется, пожалуйста подождите...' });
 
                 await interaction.editReply(
-                    '**Данные сервера в формате JSON:**' + '```json\n' + JSON.stringify(data, null, ' ') + '\n```'
+                    '**Данные сервера в формате JSON:**' + '```json\n' + JSON.stringify(data, null, 2) + '\n```'
                 );
             } catch (err) {
                 console.log(err);
