@@ -45,7 +45,9 @@ module.exports = {
             if (!channelBuilders.filter(channel => channel.id === channelBuilder.id)[0]) {
                 const newChannel = {
                     id: channelBuilder.id,
+                    name: channelBuilder.name,
                     categoryWhereCreate: category.id,
+                    categoryWhereCreateName: category.name,
                     createdChannelName: channelName,
                     userLimit: users,
                 };
