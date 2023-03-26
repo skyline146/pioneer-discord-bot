@@ -17,7 +17,7 @@ module.exports = {
             await interaction.deferReply({ ephemeral: true });
 
             const data = await servers.get(interaction.guild.id);
-            if (Object.keys(data).length === 0) {
+            if (!data || Object.keys(data).length === 0) {
                 await interaction.editReply('Данных вашего сервера нет в базе.');
                 return;
             }
