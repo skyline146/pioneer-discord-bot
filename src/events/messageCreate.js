@@ -15,7 +15,7 @@ module.exports = {
         if (message.guildId === process.env.DEV_GUILD) {
             const channel = message.channel;
 
-            if (allowedChannels.lastIndexOf(channel.id) === -1) return;
+            if (!allowedChannels.includes(channel.id)) return;
 
             const newMessage = await channel.send({ content: '...' });
 
@@ -23,14 +23,7 @@ module.exports = {
                 switch (channel.id) {
                     //chatgpt
                     case '1073572140693073970': {
-                        await newMessage.edit({ content: 'ChatGPT думает над ответом... ' });
-
-                        // let text = await chat.get(message.author.id);
-                        // if (!text) text = '';
-
-                        // text += `Human: ${message.content}\n`;
-
-                        // const { davinci } = await gptSettings.get(message.guildId);
+                        await newMessage.edit({ content: 'ChatGPT думает над ответом...' });
 
                         const chatLog = (await chat.get(message.guildId)) ?? [];
 
@@ -41,48 +34,49 @@ module.exports = {
                             messages: chatLog,
                         });
 
-                        // const response = await openai.createCompletion({
-                        //     model: 'text-davinci-003',
-                        //     prompt: message.content,
-                        //     temperature: davinci.temperature,
-                        //     max_tokens: davinci.max_tokens,
-                        //     frequency_penalty: davinci.frequency_penalty,
-                        //     presence_penalty: davinci.presence_penalty,
-                        // });
+                        //stream output, but sadly doesn't work correctly in discord :(
 
-                        // console.log(response.data.choices[0]);
+                        // let outputStream = '';
+
+                        // response.data.on('data', async data => {
+                        //     const lines = data
+                        //         .toString()
+                        //         .split('\n')
+                        //         .filter(line => line.trim() !== '');
+
+                        //     for (const line of lines) {
+                        //         const message = line.replace(/^data: /, '');
+                        //         if (message === '[DONE]') {
+                        //             return; // Stream finished
+                        //         }
+                        //         try {
+                        //             const parsed = JSON.parse(message);
+
+                        //             if (parsed.choices[0].delta.content) {
+                        //                 outputStream += parsed.choices[0].delta.content;
+                        //                 console.log(outputStream);
+                        //                 newMessage.edit({
+                        //                     content: outputStream,
+                        //                 });
+                        //             }
+                        //         } catch (error) {
+                        //             console.error('Could not JSON parse stream message', message, error);
+                        //         }
+                        //     }
+                        // });
 
                         const output = response.data.choices[0].message.content;
                         const totalTokens = response.data.usage.total_tokens;
 
-                        await newMessage.edit({ content: `**ChatGPT:** ${output}` });
+                        await newMessage.edit(output);
 
                         chatLog.push({ role: 'assistant', content: output });
 
                         if (totalTokens > 600) {
                             await chat.delete(message.guildId);
-                            // chatLog.push({
-                            //     role: 'user',
-                            //     content:
-                            //         'Summarize this dialog into 6 replicas, 3 from user and 3 from assistant. Output it in javascript array of objects, like [{role: "user", content: "First replica from user"}, {role: "assistant", content: "First replica from assistant"}]',
-                            // });
-                            // const summarizedChatLog = await openai.createChatCompletion({
-                            //     model: 'gpt-3.5-turbo',
-                            //     messages: chatLog,
-                            // });
-                            // console.log(JSON.stringify(summarizedChatLog.data.choices[0].message.content));
                         } else {
                             await chat.set(message.guildId, chatLog);
                         }
-
-                        // console.log(chatLog.length);
-
-                        // await newMessage.edit({
-                        //     content: `**ChatGPT:** ${output
-                        //         .replace('Robot: ', '')
-                        //         .replace('Computer: ', '')
-                        //         .replace('Bot: ', '')}`,
-                        // });
 
                         console.log('Total tokens: ' + totalTokens);
 
@@ -142,6 +136,7 @@ module.exports = {
             } catch (err) {
                 await newMessage.delete();
 
+                console.log(err);
                 if (err.response?.data?.error) {
                     await message.reply(err.response.data.error.message);
                 } else {
