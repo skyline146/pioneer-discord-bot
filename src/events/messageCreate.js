@@ -72,8 +72,8 @@ module.exports = {
 
                         chatLog.push({ role: 'assistant', content: output });
 
-                        if (totalTokens > 600) {
-                            await chat.delete(message.guildId);
+                        if (chatLog.length >= 6) {
+                            await chat.set(message.guildId, chatLog.slice(2));
                         } else {
                             await chat.set(message.guildId, chatLog);
                         }
