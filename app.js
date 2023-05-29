@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, Partials } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -15,6 +15,7 @@ const discordBot = new Client({
         GatewayIntentBits.DirectMessages,
         GatewayIntentBits.GuildVoiceStates,
     ],
+    partials: [Partials.Channel, Partials.Message],
 });
 
 discordBot.commands = new Collection();

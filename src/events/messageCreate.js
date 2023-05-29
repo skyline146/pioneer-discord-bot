@@ -12,9 +12,36 @@ module.exports = {
     async execute(message) {
         if (message.author.bot) return;
 
-        if (message.guildId === process.env.DEV_GUILD) {
-            const channel = message.channel;
+        const channel = message.channel;
 
+        //if dm message
+        if (!message.guild) {
+            const newMessage = await channel.send({ content: '💭 Набираю сообщение...' });
+
+            const userId = message.author.id;
+            const chatLog = (await chat.get(userId)) ?? [];
+
+            chatLog.push({ role: 'user', content: message.content });
+
+            const response = await openai.createChatCompletion({
+                model: 'gpt-3.5-turbo',
+                messages: chatLog,
+            });
+
+            const output = response.data.choices[0].message.content;
+
+            await newMessage.edit(output);
+
+            chatLog.push({ role: 'assistant', content: output });
+
+            if (chatLog.length >= 12) {
+                await chat.set(userId, chatLog.slice(2));
+            } else {
+                await chat.set(userId, chatLog);
+            }
+        }
+
+        if (message.guildId === process.env.DEV_GUILD) {
             if (!allowedChannels.includes(channel.id)) return;
 
             const newMessage = await channel.send({ content: '...' });
