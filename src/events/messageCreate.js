@@ -17,27 +17,37 @@ module.exports = {
         //if dm message
         if (!message.guild) {
             const newMessage = await channel.send({ content: '💭 Набираю сообщение...' });
+            try {
+                const userId = message.author.id;
+                const chatLog = (await chat.get(userId)) ?? [];
 
-            const userId = message.author.id;
-            const chatLog = (await chat.get(userId)) ?? [];
+                chatLog.push({ role: 'user', content: message.content });
 
-            chatLog.push({ role: 'user', content: message.content });
+                const response = await openai.createChatCompletion({
+                    model: 'gpt-3.5-turbo',
+                    messages: chatLog,
+                });
 
-            const response = await openai.createChatCompletion({
-                model: 'gpt-3.5-turbo',
-                messages: chatLog,
-            });
+                const output = response.data.choices[0].message.content;
 
-            const output = response.data.choices[0].message.content;
+                await newMessage.edit(output);
 
-            await newMessage.edit(output);
+                chatLog.push({ role: 'assistant', content: output });
 
-            chatLog.push({ role: 'assistant', content: output });
+                if (chatLog.length >= 12) {
+                    await chat.set(userId, chatLog.slice(2));
+                } else {
+                    await chat.set(userId, chatLog);
+                }
+            } catch (err) {
+                await newMessage.delete();
 
-            if (chatLog.length >= 12) {
-                await chat.set(userId, chatLog.slice(2));
-            } else {
-                await chat.set(userId, chatLog);
+                console.log(err);
+                if (err.response?.data?.error) {
+                    await message.reply(err.response.data.error.message);
+                } else {
+                    await message.reply(`Возникла ошибка при обработке запроса.`);
+                }
             }
         }
 
